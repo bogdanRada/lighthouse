@@ -63,7 +63,8 @@ function runLighthouse(url, configPath) {
     `--config-path=${configPath}`,
     '--output=json',
     '--quiet',
-    '--port=0'
+    '--port=0',
+    '--beacon'
   ];
 
   // Lighthouse sometimes times out waiting to for a connection to Chrome in CI.

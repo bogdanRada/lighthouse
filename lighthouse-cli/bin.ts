@@ -20,6 +20,7 @@ const _SIGINT = 'SIGINT';
 const _SIGINT_EXIT_CODE = 130;
 const _RUNTIME_ERROR_CODE = 1;
 const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
+const sheetId = '1p0fJZr708O62MnR0Rqn_Xi-bGc7shihHKa2j_LmRpTE';
 
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 const getFilenamePrefix = require('../lighthouse-core/lib/file-namer.js').getFilenamePrefix;
@@ -36,6 +37,7 @@ import * as randomPort from './random-port';
 import {Results} from './types/types';
 const yargs = require('yargs');
 const opn = require('opn');
+const Analytics = require('../lighthouse-core/lib/analytics');
 
 interface LighthouseError extends Error {
   code?: string
@@ -91,13 +93,15 @@ const cliFlags = yargs
   .group([
     'output',
     'output-path',
-    'view'
+    'view',
+    'beacon',
   ], 'Output:')
   .describe({
     'output': 'Reporter for the results, supports multiple values',
     'output-path': `The file path to output the results
 Example: --output-path=./lighthouse-results.html`,
-    'view': 'Open HTML report in your browser'
+    'view': 'Open HTML report in your browser',
+    'beacon': 'Send to analytics',
   })
 
   // boolean values
@@ -117,7 +121,8 @@ Example: --output-path=./lighthouse-results.html`,
     'verbose',
     'quiet',
     'help',
-    'interactive'
+    'interactive',
+    'beacon'
   ])
   .choices('output', Printer.GetValidOutputOptions())
 
@@ -261,7 +266,7 @@ function handleError(err: LighthouseError) {
 
 function saveResults(results: Results,
                      artifacts: Object,
-                     flags: {output: any, outputPath: string, saveArtifacts: boolean, saveAssets: boolean, view: boolean}) {
+                     flags: {output: any, outputPath: string, saveArtifacts: boolean, saveAssets: boolean, view: boolean, beacon: boolean}) {
     let promise = Promise.resolve(results);
     const cwd = process.cwd();
     // Use the output path as the prefix for all generated files.
@@ -276,6 +281,88 @@ function saveResults(results: Results,
 
     if (flags.saveAssets) {
       promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
+    }
+
+    if (flags.beacon) {
+      let analyticsData = {
+        url: results.url,
+        version: results.lighthouseVersion,
+      };
+
+      const analytics = new Analytics(sheetId);
+      let hasColumns = false;
+      let audits: Array<any> = [
+        {
+          name: 'url',
+          rawValue: results.url,
+        },
+        {
+          name: 'version',
+          rawValue: results.lighthouseVersion,
+        },
+        ...Object.keys(results.audits).map((key) => (<any> results.audits)[key]),
+      ];
+
+      const columnsRange = Analytics.calculateRange([audits]);
+      promise = promise.then(_ =>
+        analytics.fetch(
+          columnsRange,
+          'Data'
+        )
+      // format an create columns
+      ).then((headerRow) => {
+        let columns: Array<string> = [];
+
+        // If we have a header set defaults
+        if (headerRow.values && headerRow.values[0] && headerRow.values[0].length) {
+          columns = headerRow.values[0];
+          hasColumns = true;
+        }
+
+        audits.forEach((audit: any) => {
+          const auditIndex = columns.indexOf(<string> audit.name);
+          if (auditIndex === -1) {
+            columns.push(audit.name);
+          }
+        });
+
+        return columns;
+      // format audit data
+      }).then(columns => {
+        let results: Array<any> = Array(columns.length).fill('');
+
+        audits.forEach((audit: any) => {
+          let index = columns.indexOf(<string> audit.name);
+          if (index > -1) {
+            results[index] = <any> audit.rawValue;
+          }
+        });
+
+        return [
+          columns,
+          results
+        ];
+      }).then((results) => {
+        let updatePromise = Promise.resolve();
+        if (hasColumns) {
+          updatePromise = analytics.update(
+            [results[0]],
+            'Data',
+            Analytics.calculateRange([results[0]])
+          );
+          results.shift();
+        }
+
+        let appendPromise = analytics.append(
+          results,
+          'Data'
+        );
+
+        return Promise.all([
+          updatePromise,
+          appendPromise,
+        ]);
+      });
     }
 
     if (flags.output === Printer.OutputMode[Printer.OutputMode.none]) {
@@ -304,7 +391,7 @@ function saveResults(results: Results,
 export async function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
                          outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
-                         chromeFlags: string, maxWaitForLoad: number, view: boolean},
+                         chromeFlags: string, maxWaitForLoad: number, view: boolean, beacon: boolean},
                        config: Object | null): Promise<{}|void> {
 
   let chromeLauncher: ChromeLauncher | undefined = undefined;
