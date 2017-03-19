@@ -64,8 +64,11 @@ function runLighthouse(url, configPath) {
     '--output=json',
     '--quiet',
     '--port=0',
-    '--beacon'
   ];
+
+  if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    args.push('--beacon');
+  }
 
   // Lighthouse sometimes times out waiting to for a connection to Chrome in CI.
   // Watch for this error and retry relaunching Chrome and running Lighthouse up
