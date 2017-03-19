@@ -15,6 +15,8 @@ install:
   - npm install
   - npm run install-all
 before_script:
+  - openssl aes-256-cbc -K $encrypted_83706645e717_key -iv $encrypted_83706645e717_iv -in lighthouse-test-9ce94acd7324.json.enc -out lighthouse-test-9ce94acd7324.json -d
+  - export GOOGLE_APPLICATION_CREDENTIALS=lighthouse-test-9ce94acd7324.json
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
