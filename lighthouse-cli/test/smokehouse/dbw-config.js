@@ -12,8 +12,8 @@ module.exports = {
   extends: 'lighthouse:default',
   settings: {
     onlyAudits: [
-      'deprecations',
       'appcache-manifest',
+      'deprecations',
       'dom-size',
       'external-anchors-use-rel-noopener',
       'geolocation-on-start',
@@ -25,8 +25,8 @@ module.exports = {
       'notification-on-start',
       'password-inputs-can-be-pasted-into',
       'script-blocking-first-paint',
+      'uses-http2',
       'uses-passive-event-listeners',
-      'uses-http2'
     ]
   }
 };
