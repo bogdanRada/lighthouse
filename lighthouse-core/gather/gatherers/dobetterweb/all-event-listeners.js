@@ -121,6 +121,9 @@ class EventListeners extends Gatherer {
       .then(nodes => {
         nodes.push('document', 'window');
         return this.collectListeners(nodes);
+      }).then(listeners => {
+        return options.driver.sendCommand('DOM.disable')
+          .then(() => listeners);
       });
   }
 }
