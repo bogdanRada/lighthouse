@@ -31,16 +31,21 @@ before_script:
   - sh -e /etc/init.d/xvfb start
   - sleep 3 # wait for xvfb to boot
   - yarn build-all
-script:
-  - yarn bundlesize
-  - yarn test-cli-formatting
-  - yarn test-launcher-formatting
-  - yarn lint
-  - yarn unit
-  - yarn closure
-  - yarn smoke
-  - yarn smokehouse
-  - yarn plots-smoke
+jobs:
+  include:
+    - stage: Tests
+      script:
+        - yarn bundlesize
+        - yarn test-cli-formatting
+        - yarn test-launcher-formatting
+        - yarn lint
+        - yarn unit
+        - yarn closure
+    - stage: Smokehouse
+      script:
+        - yarn smoke
+        - yarn smokehouse
+        - yarn plots-smoke
 before_cache:
   # the `yarn compile-devtools` task adds these to node_modules, which slows down caching
   - rm -rf ./node_modules/temp-devtoolsfrontend/
