@@ -14,7 +14,6 @@ cache:
     - lighthouse-cli/node_modules
     - lighthouse-extension/node_modules
     - lighthouse-viewer/node_modules
-    - /home/travis/.rvm/gems/
 install:
   - curl -sL https://raw.githubusercontent.com/travis-ci/artifacts/master/install | bash
   - yarn
@@ -51,27 +50,21 @@ jobs:
       node_js: "6.9.1"
       env: UNIT=true
       install: skip
-      addons: skip
     - node_js: "6.9.1"
       env: SMOKEHOUSE=true
       install: skip
-      addons: skip
     - node_js: "7"
       env: UNIT=true
       install: skip
-      addons: skip
     - node_js: "7"
       env: SMOKEHOUSE=true
       install: skip
-      addons: skip
     - node_js: "8"
       env: UNIT=true
       install: skip
-      addons: skip
     - node_js: "8"
       env: SMOKEHOUSE=true
       install: skip
-      addons: skip
 before_cache:
   # the `yarn compile-devtools` task adds these to node_modules, which slows down caching
   - rm -rf ./node_modules/temp-devtoolsfrontend/
