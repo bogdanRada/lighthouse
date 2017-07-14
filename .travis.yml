@@ -82,5 +82,3 @@ after_failure:
 #  - grep 'No screenshots' perf.json && artifacts upload --target-paths perf-0.trace.json
 addons:
   chrome: stable
-  artifacts:
-    s3_region: "us-west-2"
