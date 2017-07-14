@@ -16,6 +16,7 @@ cache:
     - lighthouse-viewer/node_modules
     - /home/travis/.rvm/gems/
 install:
+  - curl -sL https://raw.githubusercontent.com/travis-ci/artifacts/master/install | bash
   - yarn
   # travis can't handle the parallel install (without caches)
   - yarn run install-all:task:windows
@@ -78,7 +79,7 @@ before_cache:
 after_success:
 #  - ./lighthouse-core/scripts/generate-combined-coverage.sh
 after_failure:
-#  - grep 'No screenshots' perf.json && travis-artifacts upload --path perf-0.trace.json
+#  - grep 'No screenshots' perf.json && artifacts upload --target-paths perf-0.trace.json
 addons:
   chrome: stable
   artifacts:
