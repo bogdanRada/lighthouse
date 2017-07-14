@@ -43,29 +43,38 @@ jobs:
     - stage: prepare cache
       node_js: "6.9.1"
       script: skip
+      cache: skip
     - node_js: "7"
       script: skip
+      cache: skip
     - node_js: "8"
       script: skip
+      cache: skip
     - stage: test
       node_js: "6.9.1"
       env: UNIT=true
       install: skip
+      cache: skip
     - node_js: "6.9.1"
       env: SMOKEHOUSE=true
       install: skip
+      cache: skip
     - node_js: "7"
       env: UNIT=true
       install: skip
+      cache: skip
     - node_js: "7"
       env: SMOKEHOUSE=true
       install: skip
+      cache: skip
     - node_js: "8"
       env: UNIT=true
       install: skip
+      cache: skip
     - node_js: "8"
       env: SMOKEHOUSE=true
       install: skip
+      cache: skip
 before_cache:
   # the `yarn compile-devtools` task adds these to node_modules, which slows down caching
   - rm -rf ./node_modules/temp-devtoolsfrontend/
