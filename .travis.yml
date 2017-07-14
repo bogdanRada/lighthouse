@@ -16,7 +16,6 @@ cache:
     - lighthouse-viewer/node_modules
     - /home/travis/.rvm/gems/
 install:
-  - gem install travis-artifacts
   - yarn
   # travis can't handle the parallel install (without caches)
   - yarn run install-all:task:windows
@@ -51,21 +50,27 @@ jobs:
       node_js: "6.9.1"
       env: UNIT=true
       install: skip
+      addons: skip
     - node_js: "6.9.1"
       env: SMOKEHOUSE=true
       install: skip
+      addons: skip
     - node_js: "7"
       env: UNIT=true
       install: skip
+      addons: skip
     - node_js: "7"
       env: SMOKEHOUSE=true
       install: skip
+      addons: skip
     - node_js: "8"
       env: UNIT=true
       install: skip
+      addons: skip
     - node_js: "8"
       env: SMOKEHOUSE=true
       install: skip
+      addons: skip
 before_cache:
   # the `yarn compile-devtools` task adds these to node_modules, which slows down caching
   - rm -rf ./node_modules/temp-devtoolsfrontend/
@@ -76,3 +81,5 @@ after_failure:
 #  - grep 'No screenshots' perf.json && travis-artifacts upload --path perf-0.trace.json
 addons:
   chrome: stable
+  artifacts:
+    s3_region: "us-west-2"
