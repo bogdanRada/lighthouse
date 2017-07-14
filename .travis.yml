@@ -29,7 +29,7 @@ before_script:
 
 script:
   - 'if [ "${SMOKEHOUSE}" = "true" ]; then yarn build-all; fi'
-  - 'if [ "${UNIT}" = "true" ]; then yarn bundlesize; fi'
+  - 'if [ "${SMOKEHOUSE}" = "true" ]; then yarn bundlesize; fi'
   - 'if [ "${UNIT}" = "true" ]; then yarn test-cli-formatting; fi'
   - 'if [ "${UNIT}" = "true" ]; then yarn test-launcher-formatting; fi'
   - 'if [ "${UNIT}" = "true" ]; then yarn lint; fi'
