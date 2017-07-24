@@ -11,22 +11,13 @@
 module.exports = {
   extends: 'lighthouse:default',
   settings: {
+    onlyCategories: [
+      'best-practices'
+    ],
     onlyAudits: [
-      'deprecations',
-      'appcache-manifest',
       'dom-size',
-      'external-anchors-use-rel-noopener',
-      'geolocation-on-start',
-      'is-on-https',
       'link-blocking-first-paint',
-      'no-document-write',
-      'no-mutation-events',
-      'no-websql',
-      'notification-on-start',
-      'password-inputs-can-be-pasted-into',
       'script-blocking-first-paint',
-      'uses-passive-event-listeners',
-      'uses-http2'
     ]
   }
 };
