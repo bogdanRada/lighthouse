@@ -10,10 +10,4 @@
  */
 module.exports = {
   extends: 'lighthouse:default',
-  settings: {
-    onlyAudits: [
-      'first-interactive',
-      'consistently-interactive',
-    ]
-  }
 };
