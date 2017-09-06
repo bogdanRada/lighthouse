@@ -64,6 +64,9 @@ jobs:
       env:
         - LINT=true
       script:
+        # stop travis when PR and not node 6.9.1
+        - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ "$TRAVIS_NODE_VERSION" != "6.9.1" ]; then travis_terminate 0; fi'
+        - '[ -z "$encrypted_83706645e717_key" ] || [ -z "$encrypted_83706645e717_iv" ] && export USE_GCLOUD=false || export USE_GCLOUD=true'
         - chmod +x travis/install_gcloud.sh
         - |
           if [ "$USE_GCLOUD" = "true" ]; then
@@ -74,11 +77,11 @@ jobs:
         - 'if [ "$USE_GCLOUD" = "false" ]; then yarn; fi'
         - export CHROME_PATH=$(which google-chrome-stable)
         - 'if [ "${UNIT}" = "true" ] || [ "${SMOKE}" = "true" ]; then sh -e /etc/init.d/xvfb start; sleep 3; fi;'
-        - 'if [ "${LINT}" = "true" ]; then yarn test-cli-formatting; fi'
-        - 'if [ "${LINT}" = "true" ]; then yarn test-launcher-formatting; fi'
+        - 'if [ "${LINT}" = "true" ]; then yarn install-cli && yarn test-cli-formatting; fi'
+        - 'if [ "${LINT}" = "true" ]; then yarn install-launcher && yarn test-launcher-formatting; fi'
         - 'if [ "${LINT}" = "true" ]; then yarn lint; fi'
-        - 'if [ "${LINT}" = "true" ]; then yarn closure; fi'
-        - 'if [ "${UNIT}" = "true" ]; then yarn install-launcher && yarn build-launcher && yarn install-cli && yarn build-cli && yarn unit; fi'
+        - 'if [ "${LINT}" = "true" ]; then yarn && yarn closure; fi'
+        - 'if [ "${UNIT}" = "true" ]; then yarn build-launcher && yarn build-cli && yarn unit; fi'
         - 'if [ "${UNIT}" = "true" ]; then yarn smoke; fi'
         - 'if [ "${SMOKE}" = "true" ] && [ "$TRAVIS_NODE_VERSION" = "6.9.1" ]; then yarn install-extension && yarn build-extension && yarn compile-devtools; fi'
         - 'if [ "${SMOKE}" = "true" ]; then yarn install-launcher && yarn build-launcher &&  yarn install-cli && yarn build-cli && yarn smokehouse; fi'
@@ -124,6 +127,7 @@ jobs:
         - SMOKE=true
         - UNIT=true
       script:
+        - '[ -z "$encrypted_83706645e717_key" ] || [ -z "$encrypted_83706645e717_iv" ] && export USE_GCLOUD=false || export USE_GCLOUD=true'
         - |
           if [ "$USE_GCLOUD" = "true" ]; then
             chmod +x travis/install_gcloud.sh
